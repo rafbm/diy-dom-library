@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="./qunit/qunit/qunit.css">
+  <script src="./qunit/qunit/qunit.js"></script>
+  <script src="../src/domwrapper.js"></script>
+  <style>tt{font-family:monospace,monospace}</style>
+</head>
+<body>
+  <h1 id="qunit-header">DomWrapper.js Unit Tests</h1>
+  <h2 id="qunit-banner"></h2>
+  <div id="qunit-testrunner-toolbar"></div>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"></ol>
+  <div id="qunit-fixture">
+    <!-- module: $ function -->
+    <div id="blah">
+      <h1>test h1</h1>
+      <h2>test h2</h2>
+    </div>
+  </div>
+  <script>
+    module('$ function')
+
+    test("<tt>$()</tt>", function() {
+      var emptySet = $()
+      equal(emptySet instanceof DomWrapper, true, '<tt>instanceof DomWrapper</tt>')
+      equal(emptySet.length, 0, '<tt>.length</tt> property')
+    })
+
+    test("<tt>$(null)</tt>", function() {
+      var emptySet = $(null)
+      equal(emptySet instanceof DomWrapper, true, '<tt>instanceof DomWrapper</tt>')
+      equal(emptySet.length, 0, '<tt>.length</tt> property')
+    })
+
+    test("<tt>$('selector')</tt>", function() {
+      var divs = $('div')
+      equal(divs.length, 3, 'Two <tt>div</tt>’s in this document.')
+      equal(divs[0].id, 'qunit-testrunner-toolbar')
+      equal(divs[1].id, 'qunit-fixture')
+      equal(divs[2].id, 'blah')
+    })
+
+    test("<tt>$('selector', context)</tt>", function() {
+      var headings = $('h1, h2', document.getElementById('blah'))
+      equal(headings.length, 2, 'One <tt>h1</tt> and one <tt>h2</tt> id <tt>div#blah</tt>.')
+      equal(headings[0].nodeName, 'H1')
+      equal(headings[0].innerHTML, 'test h1')
+      equal(headings[1].nodeName, 'H2')
+      equal(headings[1].innerHTML, 'test h2')
+    })
+
+    test("<tt>$('<html>')</tt>", function() {
+      var divs = $('<div>foo <span>bar</span> baz</div><div>quux')
+
+      equal(divs.length, 2)
+
+      equal(divs[0].innerHTML, 'foo <span>bar</span> baz')
+      equal(divs[0].textContent, 'foo bar baz')
+      equal(divs[1].innerHTML, 'quux')
+
+      var input = $('<input type="checkbox" disabled value="shizzle">')[0]
+      equal(input.type, 'checkbox')
+      equal(input.checked, false)
+      equal(input.disabled, true)
+      equal(input.value, 'shizzle')
+    })
+
+    test("<tt>$(element)</tt>", function() {
+      var body = $(document.body)[0]
+      equal(body, document.body)
+      equal(body.parentNode, document.documentElement)
+    })
+
+    test("<tt>$(DomWrapper instance)</tt>", function() {
+      equal($($(document.body))[0], document.body)
+    })
+
+    test("<tt>$(iterable)</tt>", function() {
+      var stuff = $(['foozle', document, document.body, 42])
+      equal(stuff.length, 4)
+      equal(stuff[0], 'foozle')
+      equal(stuff[1], document)
+      equal(stuff[2], document.body)
+      equal(stuff[3], 42)
+    })
+
+
+    module('HTML')
+
+    test('<tt>.html()</tt> and <tt>.text()</tt>', function() {
+      var div = document.createElement('div')
+
+      equal($(div).html(), '')
+      equal($(div).text(), '')
+
+
+      $(div).html('foo')
+      equal($(div).html(), 'foo')
+      equal($(div).text(), 'foo')
+
+      $(div).html('<p>')
+      equal($(div).html(), '<p></p>')
+      equal($(div).text(), '')
+
+      $(div).html('<p>boom')
+      equal($(div).html(), '<p>boom</p>')
+      equal($(div).text(), 'boom')
+
+
+      $(div).text('foo')
+      equal($(div).html(), 'foo')
+      equal($(div).text(), 'foo')
+
+      $(div).text('<p>')
+      equal($(div).html(), '&lt;p&gt;')
+      equal($(div).text(), '<p>')
+
+      $(div).text('<p>boom')
+      equal($(div).html(), '&lt;p&gt;boom')
+      equal($(div).text(), '<p>boom')
+    })
+
+
+    module('Manipulations')
+    var manipsDivContent = '\
+      <p class="first-p">Lorem</p>\
+      <ul class="first-ul">\
+        <li>ipsum</li>\
+        <li>dolor</li>\
+        <li>sit</li>\
+      </ul>\
+      <p class="second-p">amet</p>.'
+
+    test('<tt>.append()</tt>', function() {
+      var manipsDiv = document.createElement('div')
+
+      manipsDiv.innerHTML = manipsDivContent
+      $(manipsDiv).append(manipsDiv.children[1])
+      equal(manipsDiv.children[0].className, 'first-p', 'Append existing element, once.')
+      equal(manipsDiv.children[1].className, 'second-p', 'Append existing element, once.')
+      equal(manipsDiv.children[2].className, 'first-ul', 'Append existing element, once.')
+
+      manipsDiv.innerHTML = manipsDivContent
+      var $li = $(manipsDiv.getElementsByTagName('li'))
+      $li.append(manipsDiv.children[0])
+      equal(manipsDiv.children.length, 2, 'Append existing element, more than once.')
+      equal($li[0].children[0].nodeName, 'P', 'Append existing element, more than once.')
+      equal($li[1].children[0].className, 'first-p', 'Append existing element, more than once.')
+      equal($li[2].children[0].innerHTML, 'Lorem', 'Append existing element, more than once.')
+
+      // BROKEN™
+      // manipsDiv.innerHTML = manipsDivContent
+      // var $li = $(manipsDiv.getElementsByTagName('li'))
+      //   , $p = manipsDiv.getElementsByTagName('p')
+      // $li.append($p)
+      // console.log("$li =", $li)
+      // equal(manipsDiv.children.length, 1, 'Append two existing elements, more than once.')
+      // equal($li[0].children.length, 2, 'Append two existing elements, more than once.')
+      // equal($li[1].children.length, 2, 'Append two existing elements, more than once.')
+      // equal($li[2].children.length, 2, 'Append two existing elements, more than once.')
+
+      manipsDiv.innerHTML = manipsDivContent
+      var $li = $(manipsDiv.getElementsByTagName('li'))
+      $li.append('-yaarrgggh')
+      equal($li[0].innerHTML, 'ipsum-yaarrgggh', 'Append text.')
+      equal($li[1].innerHTML, 'dolor-yaarrgggh', 'Append text.')
+      equal($li[2].innerHTML, 'sit-yaarrgggh', 'Append text.')
+
+      manipsDiv.innerHTML = manipsDivContent
+      var $p = $(manipsDiv.getElementsByTagName('p'))
+      $p.append('<b>bam</b>')
+      equal($p[0].innerHTML, 'Lorem<b>bam</b>', 'Append HTML.')
+      equal($p[1].innerHTML, 'amet<b>bam</b>', 'Append HTML.')
+    })
+
+    test('<tt>.prepend()</tt>', function() {
+    })
+
+    test('<tt>.after()</tt>', function() {
+    })
+
+    test('<tt>.before()</tt>', function() {
+    })
+
+    test('<tt>.remove()</tt>', function() {
+      var manipsDiv = document.createElement('div')
+      manipsDiv.innerHTML = manipsDivContent
+
+      $(manipsDiv.getElementsByTagName('p')).remove()
+      equal(manipsDiv.children.length, 1)
+      equal(manipsDiv.children[0].children.length, 3)
+
+      $(manipsDiv.getElementsByTagName('li')).remove()
+      equal(manipsDiv.children.length, 1)
+      equal(manipsDiv.children[0].children.length, 0)
+
+      $(manipsDiv.getElementsByTagName('ul')).remove()
+      equal(manipsDiv.children.length, 0)
+    })
+
+
+    module('className')
+
+    test('<tt>.addClass()</tt>', function() {
+      var elem = document.createElement('b')
+      elem.className = 'foo foobar bazfoo boom-doom boom quux shizzle_bam'
+
+      $(elem).addClass('shlack')
+      elem.className = elem.className.replace(/\s+/g, ' ').trim()
+      equal(elem.className, 'foo foobar bazfoo boom-doom boom quux shizzle_bam shlack', 'Add new class.')
+
+      $(elem).addClass('bam vlap')
+      elem.className = elem.className.replace(/\s+/g, ' ').trim()
+      equal(elem.className, 'foo foobar bazfoo boom-doom boom quux shizzle_bam shlack bam vlap', 'Add two new classes.')
+
+      $(elem).addClass('boom-doom')
+      elem.className = elem.className.replace(/\s+/g, ' ').trim()
+      equal(elem.className, 'foo foobar bazfoo boom-doom boom quux shizzle_bam shlack bam vlap', 'Try to add existing class.')
+    })
+
+    test('<tt>.removeClass()</tt>', function() {
+      var elem = document.createElement('b')
+      elem.className = 'foo foobar bazfoo boom-doom boom quux shizzle_bam'
+
+      $(elem).removeClass('foo')
+      elem.className = elem.className.replace(/\s+/g, ' ').trim()
+      equal(elem.className, 'foobar bazfoo boom-doom boom quux shizzle_bam', 'Remove existing class.')
+
+      $(elem).removeClass('boom boom-doom')
+      elem.className = elem.className.replace(/\s+/g, ' ').trim()
+      equal(elem.className, 'foobar bazfoo quux shizzle_bam', 'Remove two existing classes.')
+
+      $(elem).removeClass('bam')
+      elem.className = elem.className.replace(/\s+/g, ' ').trim()
+      equal(elem.className, 'foobar bazfoo quux shizzle_bam', 'Try to remove non-existing class.')
+    })
+
+    test('<tt>.hasClass()</tt>', function() {
+      var elem = document.createElement('b')
+      elem.className = 'foo foobar bazfoo boom-doom boom quux shizzle_bam'
+
+      equal($(elem).hasClass('foo'), true)
+
+      equal($(elem).hasClass('boom-doom'), true)
+
+      equal($(elem).hasClass('bam'), false)
+    })
+
+    test('<tt>.toggleClass()</tt>', function() {
+      var elem = document.createElement('b')
+      elem.className = 'foo foobar bazfoo boom-doom boom quux shizzle_bam'
+
+      $(elem).toggleClass('foo')
+      elem.className = elem.className.replace(/\s+/g, ' ').trim()
+      equal(elem.className, 'foobar bazfoo boom-doom boom quux shizzle_bam', 'Remove one class.')
+
+      $(elem).toggleClass('boom boom-doom blah')
+      elem.className = elem.className.replace(/\s+/g, ' ').trim()
+      equal(elem.className, 'foobar bazfoo quux shizzle_bam blah', 'Remove two and add one.')
+
+      $(elem).toggleClass('bam')
+      elem.className = elem.className.replace(/\s+/g, ' ').trim()
+      equal(elem.className, 'foobar bazfoo quux shizzle_bam blah bam', 'Add one.')
+    })
+
+
+    module('Traversing')
+
+    var traversingDivContent = '\
+      <p class="first-p">Lorem</p>\
+      <ul class="first-ul">\
+        <li class="li-1"><p>ipsum</p></li>\
+        <li class="li-2">dolor</li>\
+        <li class="li-3"><p>sit</p><p>boom</p></li>\
+      </ul>\
+      <p class="second-p">amet</p>.'
+
+    test('<tt>.children()</tt>', function() {
+      var div = document.createElement('div')
+      div.innerHTML = traversingDivContent
+
+      var $children = $(div).children()
+      equal($children.length, 3)
+      equal($children[0].className, 'first-p')
+      equal($children[1].className, 'first-ul')
+      equal($children[2].className, 'second-p')
+
+      var $childrenP = $(div).children('p')
+      equal($childrenP.length, 2)
+      equal($childrenP[0].className, 'first-p')
+      equal($childrenP[1].className, 'second-p')
+
+      var $childrenChildren = $(div).children().children()
+      equal($childrenChildren.length, 3)
+      equal($childrenChildren[0].tagName, 'LI')
+      equal($childrenChildren[1].tagName, 'LI')
+      equal($childrenChildren[2].tagName, 'LI')
+    })
+
+    test('<tt>.find()</tt>', function() {
+      var div = document.createElement('div')
+      div.innerHTML = traversingDivContent
+
+      var $descendants = $(div).find()
+      equal($descendants.length, 9)
+      equal($descendants[0].className, 'first-p')
+      equal($descendants[1].className, 'first-ul')
+      equal($descendants[2].tagName, 'LI')
+      equal($descendants[3].tagName, 'P')
+      equal($descendants[4].tagName, 'LI')
+      equal($descendants[5].tagName, 'LI')
+      equal($descendants[6].tagName, 'P')
+      equal($descendants[7].tagName, 'P')
+      equal($descendants[8].className, 'second-p')
+
+      var $descendantsP = $(div).find('p')
+      equal($descendantsP.length, 5)
+
+      var $descendantsDescendants = $(div).find().find()
+      equal($descendantsDescendants.length, 6)
+      equal($descendantsDescendants[0].tagName, 'LI')
+      equal($descendantsDescendants[1].tagName, 'P')
+      equal($descendantsDescendants[2].tagName, 'LI')
+      equal($descendantsDescendants[3].tagName, 'LI')
+      equal($descendantsDescendants[4].tagName, 'P')
+      equal($descendantsDescendants[5].tagName, 'P')
+    })
+
+    test('<tt>.prev()</tt>', function() {
+      var div = document.createElement('div')
+      div.innerHTML = traversingDivContent
+
+      var LIs = div.getElementsByTagName('li')
+      equal($(LIs).prev().length, 2)
+      equal($(LIs).prev()[0].className, 'li-1')
+      equal($(LIs).prev()[1].className, 'li-2')
+
+      equal($(LIs).prev().prev().length, 1)
+      equal($(LIs).prev().prev().prev().length, 0)
+
+      equal($(LIs).prev('p').length, 0)
+    })
+
+    test('<tt>.next()</tt>', function() {
+    })
+
+    test('<tt>.siblings()</tt>', function() {
+      var traversingDivContent = '\
+        <p class="first-p">Lorem</p>\
+        <ul class="first-ul">\
+          <li class="li-1"><p>ipsum</p></li>\
+          <li class="li-2">dolor</li>\
+          <li class="li-3"><p>sit</p><p>boom</p></li>\
+          <li class="li-4"><p>sit</p><p>boom</p></li>\
+          <li class="li-5"><p>sit</p><p>boom</p></li>\
+          <li class="li-6"><p>sit</p><p>boom</p></li>\
+        </ul>\
+        <p class="second-p">amet</p>.'
+
+      var div = document.createElement('div')
+      div.innerHTML = traversingDivContent
+
+      var LIs = div.getElementsByTagName('li')
+      equal($(LIs).siblings().length, 6)
+      equal($(LIs).siblings()[0].className, 'li-1')
+      equal($(LIs).siblings()[1].className, 'li-2')
+      equal($(LIs).siblings()[2].className, 'li-3')
+      equal($(LIs).siblings()[3].className, 'li-4')
+      equal($(LIs).siblings()[4].className, 'li-5')
+      equal($(LIs).siblings()[5].className, 'li-6')
+
+      equal($(LIs).siblings('.li-1, .li-4, .li-6').length, 3)
+      equal($(LIs).siblings('.li-1, .li-4, .li-6')[0].className, 'li-1')
+      equal($(LIs).siblings('.li-1, .li-4, .li-6')[1].className, 'li-4')
+      equal($(LIs).siblings('.li-1, .li-4, .li-6')[2].className, 'li-6')
+
+      var ULs = div.getElementsByTagName('ul')
+      equal($(ULs).siblings('fieldset').length, 0)
+      equal($(ULs).siblings('p').length, 2)
+      equal($(ULs).siblings('p.first-p').length, 1)
+      equal($(ULs).siblings('p.first-doodledee').length, 0)
+    })
+
+    test('<tt>.parent()</tt>', function() {
+      var div = document.createElement('div')
+      div.innerHTML = traversingDivContent
+      div.className = 'parent-div'
+
+      var Ps = div.getElementsByTagName('p')
+      equal($(Ps).parent().length, 3)
+      equal($(Ps).parent()[0].className, 'parent-div')
+      equal($(Ps).parent()[1].className, 'li-1')
+      equal($(Ps).parent()[2].className, 'li-3')
+
+      equal($(Ps).parent('li').length, 2)
+      equal($(Ps).parent('li')[0].className, 'li-1')
+      equal($(Ps).parent('li')[1].className, 'li-3')
+
+      equal($(Ps).parent('table').length, 0)
+    })
+
+    test('<tt>.parents()</tt>', function() {
+      var div = document.createElement('div')
+      div.innerHTML = traversingDivContent
+      div.className = 'parent-div'
+
+      var Ps = div.getElementsByTagName('p')
+      equal($(Ps).parents().length, 4, 'Parents must be from deeper to top')
+      equal($(Ps).parents()[0].className, 'li-1', 'Parents must be from deeper to top')
+      equal($(Ps).parents()[1].className, 'li-3', 'Parents must be from deeper to top')
+      equal($(Ps).parents()[2].className, 'first-ul', 'Parents must be from deeper to top')
+      equal($(Ps).parents()[3].className, 'parent-div', 'Parents must be from deeper to top')
+
+      equal($(Ps).parents('li').length, 2)
+      equal($(Ps).parents('li')[0].className, 'li-1')
+      equal($(Ps).parents('li')[1].className, 'li-3')
+      
+      equal($(Ps).parents('table').length, 0)
+    })
+
+
+    module('Filtering')
+
+    test('<tt>.is()</tt>', function() {
+      var div = document.createElement('div')
+      div.innerHTML = traversingDivContent
+      div.className = 'parent-div'
+
+      var Ps = div.getElementsByTagName('p')
+      equal($(Ps).is('p'), true)
+      equal($(Ps).is('.foo'), false)
+      equal($(Ps[0]).is('p.first-p'), true)
+      equal($(Ps[0]).is('.first-p'), true)
+      equal($(Ps[1]).is('.first-p'), false)
+      equal($(Ps[0]).is('.foo'), false)
+
+      equal($(Ps[0]).is('.parent-div .first-p'), true)
+      equal($(Ps[0]).is('.parent-div > .first-p'), true)
+      equal($(Ps[0]).is('.parent-div ~ .first-p'), false)
+
+      equal($(Ps[0]).is('p ~ p'), false)
+      equal($(Ps[1]).is('p ~ p'), false)
+      equal($(Ps[2]).is('p ~ p'), false)
+      equal($(Ps[3]).is('p ~ p'), true)
+      equal($(Ps[4]).is('p ~ p'), true)
+    })
+
+    test('<tt>.filter()</tt>', function() {
+      var div = document.createElement('div')
+      div.innerHTML = traversingDivContent
+      div.className = 'parent-div'
+
+      var Ps = div.getElementsByTagName('p')
+      equal($(Ps).filter('p').length, 5)
+      equal($(Ps).filter('.foo').length, 0)
+      equal($(Ps[0]).filter('p.first-p').length, 1)
+      equal($(Ps[0]).filter('.first-p').length, 1)
+      equal($(Ps[1]).filter('.first-p').length, 0)
+      equal($(Ps[0]).filter('.foo').length, 0)
+
+      equal($(Ps[0]).filter('.parent-div .first-p').length, 1)
+      equal($(Ps[0]).filter('.parent-div > .first-p').length, 1)
+      equal($(Ps[0]).filter('.parent-div ~ .first-p').length, 0)
+
+      equal($(Ps[0]).filter('p ~ p').length, 0)
+      equal($(Ps[1]).filter('p ~ p').length, 0)
+      equal($(Ps[2]).filter('p ~ p').length, 0)
+      equal($(Ps[3]).filter('p ~ p').length, 1)
+      equal($(Ps[4]).filter('p ~ p').length, 1)
+    })
+
+    test('<tt>.not()</tt>', function() {
+      var div = document.createElement('div')
+      div.innerHTML = traversingDivContent
+      div.className = 'parent-div'
+
+      var Ps = div.getElementsByTagName('p')
+      equal($(Ps).not('p').length, 0)
+      equal($(Ps).not('.foo').length, 5)
+      equal($(Ps[0]).not('p.first-p').length, 0)
+      equal($(Ps[0]).not('.first-p').length, 0)
+      equal($(Ps[1]).not('.first-p').length, 1)
+      equal($(Ps[0]).not('.foo').length, 1)
+
+      equal($(Ps[0]).not('.parent-div .first-p').length, 0)
+      equal($(Ps[0]).not('.parent-div > .first-p').length, 0)
+      equal($(Ps[0]).not('.parent-div ~ .first-p').length, 1)
+
+      equal($(Ps[0]).not('p ~ p').length, 1)
+      equal($(Ps[1]).not('p ~ p').length, 1)
+      equal($(Ps[2]).not('p ~ p').length, 1)
+      equal($(Ps[3]).not('p ~ p').length, 0)
+      equal($(Ps[4]).not('p ~ p').length, 0)
+
+      equal($(Ps[3]).not(Ps[4]).length, 1)
+      equal($(Ps[4]).not(Ps[4]).length, 0)
+
+      var elems = div.getElementsByTagName('*')
+      equal($(elems).not(Ps).length, 4)
+    })
+
+
+    module('CSS')
+
+    test('<tt>.css()</tt>', function() {
+      $('body').css('display', 'block')
+      equal($('body').css('display'), 'block')
+
+      $('body').css('display', 'none')
+      equal($('body').css('display'), 'none')
+
+      $('body').css('display', 'block')
+      equal($('body').css('display'), 'block')
+
+      $('body').css('display', 'foo')
+      equal($('body').css('display'), 'block')
+
+      ok($('body').css('font-size'))
+      equal($('body').css('font-size'), $('body').css('fontSize'))
+
+
+      equal($('body').css('font-weight'), 'normal')
+
+      $('body').css('font-weight', 'bold')
+      equal($('body').css('fontWeight'), 'bold')
+
+      $('body').css('fontWeight', 'normal')
+      equal($('body').css('font-weight'), 'normal')
+
+
+      $('body').css({
+        'padding-top': '10px',
+        'paddingRight': '20',
+        'padding-bottom': 30,
+        paddingLeft: '40em'
+      })
+      equal($('body').css('paddingTop'), '10px')
+      equal($('body').css('padding-right'), '20px')
+      equal($('body').css('paddingBottom'), '30px')
+      equal($('body').css('padding-left'), (parseInt($('body').css('font-size')) * 40) + 'px')
+
+      $('body').css({
+        'padding-top': '0px',
+        'paddingRight': '0',
+        'padding-bottom': 0,
+        paddingLeft: '0em'
+      })
+      equal($('body').css('paddingTop'), '0px')
+      equal($('body').css('padding-right'), '0px')
+      equal($('body').css('paddingBottom'), '0px')
+      equal($('body').css('padding-left'), '0px')
+    })
+  </script>
+</body>
+</html>

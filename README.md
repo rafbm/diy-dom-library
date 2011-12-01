@@ -47,13 +47,20 @@ First of all, please **don’t waste your time with cross-browser compatibility*
 
 You might want to iterate on your project by multiple steps. Then this could be a pretty good road map to have:
 
+### (already baked in with love)
+
+```
+$(element)
+$(HTMLCollection)
+
+.each(callback)
+```
+
 ### The Basics
 
 ```
 $(selector)
 $(html_string)
-
-.each(callback)
 
 .text([text]) (be careful about how you decide to get or set…)
 .html([html]) (be careful about how you decide to get or set…)
@@ -92,8 +99,6 @@ Always make sure calling methods on empty DomWrapper sets doesn’t break!
 
 ```
 $(selector, context)
-$(HTMLCollection)
-$(element)
 
 .addClass, .removeClass, .toggleClass with multiple classes
 

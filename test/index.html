@@ -8,7 +8,7 @@
   <style>tt{font-family:monospace,monospace}</style>
 </head>
 <body>
-  <h1 id="qunit-header">DomWrapper.js Unit Tests</h1>
+  <h1 id="qunit-header">DomWrapper Unit Tests</h1>
   <h2 id="qunit-banner"></h2>
   <div id="qunit-testrunner-toolbar"></div>
   <h2 id="qunit-userAgent"></h2>
@@ -21,6 +21,8 @@
     </div>
   </div>
   <script>
+  (function() {
+
     module('$ function')
 
     test("<tt>$()</tt>", function() {
@@ -524,6 +526,7 @@
       equal($('body').css('paddingBottom'), '0px')
       equal($('body').css('padding-left'), '0px')
     })
+  })()
   </script>
 </body>
 </html>

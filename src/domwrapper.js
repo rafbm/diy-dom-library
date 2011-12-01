@@ -64,8 +64,6 @@
 
     parent: function(selector) {
     },
-    parents: function(selector) {
-    },
     closest: function(selector) {
     },
 

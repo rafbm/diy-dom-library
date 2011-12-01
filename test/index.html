@@ -484,26 +484,6 @@
       equal($(Ps).parent('table').length, 0)
     })
 
-    test('<tt>.parents()</tt>', function() {
-      var div = document.createElement('div')
-      div.innerHTML = traversingDivContent
-      div.className = 'parent-div'
-
-      var Ps = div.getElementsByTagName('p')
-      equal($(Ps).parents().length, 4, 'Parents must be from deeper to top')
-      equal($(Ps).parents()[0].className, 'li-1', 'Parents must be from deeper to top')
-      equal($(Ps).parents()[1].className, 'li-3', 'Parents must be from deeper to top')
-      equal($(Ps).parents()[2].className, 'first-ul', 'Parents must be from deeper to top')
-      equal($(Ps).parents()[3].className, 'parent-div', 'Parents must be from deeper to top')
-
-      equal($(Ps).parents('li').length, 2)
-      equal($(Ps).parents('li')[0].className, 'li-1')
-      equal($(Ps).parents('li')[1].className, 'li-3')
-      
-      equal($(Ps).parents('table').length, 0)
-    })
-
-
 
     module('CSS')
 

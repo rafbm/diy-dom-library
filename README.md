@@ -49,86 +49,92 @@ You might want to iterate on your project by multiple steps. Then this could be 
 
 ### The Basics
 
-- `$(selector)`
-- `$(html_string)`
+```
+$(selector)
+$(html_string)
 
-- `.each(callback)`
+.each(callback)
 
-- `.text([text])` (be careful about how you decide to get or set…)
-- `.html([html])` (be careful about how you decide to get or set…)
+.text([text]) (be careful about how you decide to get or set…)
+.html([html]) (be careful about how you decide to get or set…)
 
-- `.addClass`
-- `.removeClass`
-- `.hasClass`
-- `.toggleClass`
+.addClass
+.removeClass
+.hasClass
+.toggleClass
 
-- `.is(selector)`
+.is(selector)
 
-- `.append(element)`
-- `.append(html_string)`
-- `.prepend(element)`
-- `.prepend(html_string)`
-- `.before(element)`
-- `.before(html_string)`
-- `.after(element)`
-- `.after(html_string)`
-- `.remove`
+.append(element)
+.append(html_string)
+.prepend(element)
+.prepend(html_string)
+.before(element)
+.before(html_string)
+.after(element)
+.after(html_string)
+.remove
 
-- `.find([selector])` (watch out for duplicates!)
-- `.prev([selector])`
-- `.next([selector])`
-- `.parent([selector])`
+.find([selector]) (watch out for duplicates!)
+.prev([selector])
+.next([selector])
+.parent([selector])
 
-- `.css` (accept numbers for pixel values, but there’s a catch…)
+.css (accept numbers for pixel values, but there’s a catch…)
 
-- `.on(event, callback)`
+.on(event, callback)
+```
 
 Always make sure calling methods on empty DomWrapper sets doesn’t break!
 
 
 ### Grown Up
 
-- `$(selector, context)`
-- `$(HTMLCollection)`
-- `$(element)`
+```
+$(selector, context)
+$(HTMLCollection)
+$(element)
 
-- `.addClass`, `.removeClass`, `.toggleClass` with multiple classes
+.addClass, .removeClass, .toggleClass with multiple classes
 
-- `.filter(selector)`
-- `.not(selector)`
+.filter(selector)
+.not(selector)
 
-- `.append(DomWrapper_instance)`
-- `.append(HTMLCollection)`
-- `.prepend(DomWrapper_instance)`
-- `.prepend(HTMLCollection)`
-- `.before(DomWrapper_instance)`
-- `.before(HTMLCollection)`
-- `.after(DomWrapper_instance)`
-- `.after(HTMLCollection)`
+.append(DomWrapper_instance)
+.append(HTMLCollection)
+.prepend(DomWrapper_instance)
+.prepend(HTMLCollection)
+.before(DomWrapper_instance)
+.before(HTMLCollection)
+.after(DomWrapper_instance)
+.after(HTMLCollection)
 
-- `.children([selector])`
-- `.siblings([selector])`
-- `.closest([selector])`
+.children([selector])
+.siblings([selector])
+.closest([selector])
 
-- `.css(map)`
+.css(map)
 
-- `.on('mouseenter')`
-- `.on('mouseleave')`
-- `.on('event1 event2 event3', callback)`
-- `.off`
+.on('mouseenter')
+.on('mouseleave')
+.on('event1 event2 event3', callback)
+.off
+```
 
 *Then* you could start thinking about cross-browser support.
 
 
 ### Advanced (overkill…)
 
-- `$(DomWrapper_instance)`
+```
+$(DomWrapper_instance)
 
-- `.append`, `.prepend`, `.before` and `.after` with multiple arguments
+.append, .prepend, .before and .after with multiple arguments
 
-- `.on(map)`
+.on(map)
 
-- event delegation
+event delegation
+```
 
 
 Resources

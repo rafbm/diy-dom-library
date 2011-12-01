@@ -267,6 +267,88 @@
     })
 
 
+
+    module('Filtering')
+
+    test('<tt>.is()</tt>', function() {
+      var div = document.createElement('div')
+      div.innerHTML = traversingDivContent
+      div.className = 'parent-div'
+
+      var Ps = div.getElementsByTagName('p')
+      equal($(Ps).is('p'), true)
+      equal($(Ps).is('.foo'), false)
+      equal($(Ps[0]).is('p.first-p'), true)
+      equal($(Ps[0]).is('.first-p'), true)
+      equal($(Ps[1]).is('.first-p'), false)
+      equal($(Ps[0]).is('.foo'), false)
+
+      equal($(Ps[0]).is('.parent-div .first-p'), true)
+      equal($(Ps[0]).is('.parent-div > .first-p'), true)
+      equal($(Ps[0]).is('.parent-div ~ .first-p'), false)
+
+      equal($(Ps[0]).is('p ~ p'), false)
+      equal($(Ps[1]).is('p ~ p'), false)
+      equal($(Ps[2]).is('p ~ p'), false)
+      equal($(Ps[3]).is('p ~ p'), true)
+      equal($(Ps[4]).is('p ~ p'), true)
+    })
+
+    test('<tt>.filter()</tt>', function() {
+      var div = document.createElement('div')
+      div.innerHTML = traversingDivContent
+      div.className = 'parent-div'
+
+      var Ps = div.getElementsByTagName('p')
+      equal($(Ps).filter('p').length, 5)
+      equal($(Ps).filter('.foo').length, 0)
+      equal($(Ps[0]).filter('p.first-p').length, 1)
+      equal($(Ps[0]).filter('.first-p').length, 1)
+      equal($(Ps[1]).filter('.first-p').length, 0)
+      equal($(Ps[0]).filter('.foo').length, 0)
+
+      equal($(Ps[0]).filter('.parent-div .first-p').length, 1)
+      equal($(Ps[0]).filter('.parent-div > .first-p').length, 1)
+      equal($(Ps[0]).filter('.parent-div ~ .first-p').length, 0)
+
+      equal($(Ps[0]).filter('p ~ p').length, 0)
+      equal($(Ps[1]).filter('p ~ p').length, 0)
+      equal($(Ps[2]).filter('p ~ p').length, 0)
+      equal($(Ps[3]).filter('p ~ p').length, 1)
+      equal($(Ps[4]).filter('p ~ p').length, 1)
+    })
+
+    test('<tt>.not()</tt>', function() {
+      var div = document.createElement('div')
+      div.innerHTML = traversingDivContent
+      div.className = 'parent-div'
+
+      var Ps = div.getElementsByTagName('p')
+      equal($(Ps).not('p').length, 0)
+      equal($(Ps).not('.foo').length, 5)
+      equal($(Ps[0]).not('p.first-p').length, 0)
+      equal($(Ps[0]).not('.first-p').length, 0)
+      equal($(Ps[1]).not('.first-p').length, 1)
+      equal($(Ps[0]).not('.foo').length, 1)
+
+      equal($(Ps[0]).not('.parent-div .first-p').length, 0)
+      equal($(Ps[0]).not('.parent-div > .first-p').length, 0)
+      equal($(Ps[0]).not('.parent-div ~ .first-p').length, 1)
+
+      equal($(Ps[0]).not('p ~ p').length, 1)
+      equal($(Ps[1]).not('p ~ p').length, 1)
+      equal($(Ps[2]).not('p ~ p').length, 1)
+      equal($(Ps[3]).not('p ~ p').length, 0)
+      equal($(Ps[4]).not('p ~ p').length, 0)
+
+      equal($(Ps[3]).not(Ps[4]).length, 1)
+      equal($(Ps[4]).not(Ps[4]).length, 0)
+
+      var elems = div.getElementsByTagName('*')
+      equal($(elems).not(Ps).length, 4)
+    })
+
+
     module('Traversing')
 
     var traversingDivContent = '\
@@ -421,86 +503,6 @@
       equal($(Ps).parents('table').length, 0)
     })
 
-
-    module('Filtering')
-
-    test('<tt>.is()</tt>', function() {
-      var div = document.createElement('div')
-      div.innerHTML = traversingDivContent
-      div.className = 'parent-div'
-
-      var Ps = div.getElementsByTagName('p')
-      equal($(Ps).is('p'), true)
-      equal($(Ps).is('.foo'), false)
-      equal($(Ps[0]).is('p.first-p'), true)
-      equal($(Ps[0]).is('.first-p'), true)
-      equal($(Ps[1]).is('.first-p'), false)
-      equal($(Ps[0]).is('.foo'), false)
-
-      equal($(Ps[0]).is('.parent-div .first-p'), true)
-      equal($(Ps[0]).is('.parent-div > .first-p'), true)
-      equal($(Ps[0]).is('.parent-div ~ .first-p'), false)
-
-      equal($(Ps[0]).is('p ~ p'), false)
-      equal($(Ps[1]).is('p ~ p'), false)
-      equal($(Ps[2]).is('p ~ p'), false)
-      equal($(Ps[3]).is('p ~ p'), true)
-      equal($(Ps[4]).is('p ~ p'), true)
-    })
-
-    test('<tt>.filter()</tt>', function() {
-      var div = document.createElement('div')
-      div.innerHTML = traversingDivContent
-      div.className = 'parent-div'
-
-      var Ps = div.getElementsByTagName('p')
-      equal($(Ps).filter('p').length, 5)
-      equal($(Ps).filter('.foo').length, 0)
-      equal($(Ps[0]).filter('p.first-p').length, 1)
-      equal($(Ps[0]).filter('.first-p').length, 1)
-      equal($(Ps[1]).filter('.first-p').length, 0)
-      equal($(Ps[0]).filter('.foo').length, 0)
-
-      equal($(Ps[0]).filter('.parent-div .first-p').length, 1)
-      equal($(Ps[0]).filter('.parent-div > .first-p').length, 1)
-      equal($(Ps[0]).filter('.parent-div ~ .first-p').length, 0)
-
-      equal($(Ps[0]).filter('p ~ p').length, 0)
-      equal($(Ps[1]).filter('p ~ p').length, 0)
-      equal($(Ps[2]).filter('p ~ p').length, 0)
-      equal($(Ps[3]).filter('p ~ p').length, 1)
-      equal($(Ps[4]).filter('p ~ p').length, 1)
-    })
-
-    test('<tt>.not()</tt>', function() {
-      var div = document.createElement('div')
-      div.innerHTML = traversingDivContent
-      div.className = 'parent-div'
-
-      var Ps = div.getElementsByTagName('p')
-      equal($(Ps).not('p').length, 0)
-      equal($(Ps).not('.foo').length, 5)
-      equal($(Ps[0]).not('p.first-p').length, 0)
-      equal($(Ps[0]).not('.first-p').length, 0)
-      equal($(Ps[1]).not('.first-p').length, 1)
-      equal($(Ps[0]).not('.foo').length, 1)
-
-      equal($(Ps[0]).not('.parent-div .first-p').length, 0)
-      equal($(Ps[0]).not('.parent-div > .first-p').length, 0)
-      equal($(Ps[0]).not('.parent-div ~ .first-p').length, 1)
-
-      equal($(Ps[0]).not('p ~ p').length, 1)
-      equal($(Ps[1]).not('p ~ p').length, 1)
-      equal($(Ps[2]).not('p ~ p').length, 1)
-      equal($(Ps[3]).not('p ~ p').length, 0)
-      equal($(Ps[4]).not('p ~ p').length, 0)
-
-      equal($(Ps[3]).not(Ps[4]).length, 1)
-      equal($(Ps[4]).not(Ps[4]).length, 0)
-
-      var elems = div.getElementsByTagName('*')
-      equal($(elems).not(Ps).length, 4)
-    })
 
 
     module('CSS')

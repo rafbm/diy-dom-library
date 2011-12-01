@@ -40,6 +40,15 @@
     toggleClass: function(classNames) {
     },
 
+    // element filtering
+    is: function(selector) {
+    },
+
+    filter: function(selector) {
+    },
+    not: function(selector/* or element */) {
+    },
+
     // DOM traversal
     children: function(selector) {
     },
@@ -58,15 +67,6 @@
     parents: function(selector) {
     },
     closest: function(selector) {
-    },
-
-    // element filtering
-    is: function(selector) {
-    },
-
-    filter: function(selector) {
-    },
-    not: function(selector/* or element */) {
     },
 
     // CSS styles

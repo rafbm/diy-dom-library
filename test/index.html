@@ -151,17 +151,6 @@
       equal($li[1].children[0].className, 'first-p', 'Append existing element, more than once.')
       equal($li[2].children[0].innerHTML, 'Lorem', 'Append existing element, more than once.')
 
-      // BROKEN™
-      // manipsDiv.innerHTML = manipsDivContent
-      // var $li = $(manipsDiv.getElementsByTagName('li'))
-      //   , $p = manipsDiv.getElementsByTagName('p')
-      // $li.append($p)
-      // console.log("$li =", $li)
-      // equal(manipsDiv.children.length, 1, 'Append two existing elements, more than once.')
-      // equal($li[0].children.length, 2, 'Append two existing elements, more than once.')
-      // equal($li[1].children.length, 2, 'Append two existing elements, more than once.')
-      // equal($li[2].children.length, 2, 'Append two existing elements, more than once.')
-
       manipsDiv.innerHTML = manipsDivContent
       var $li = $(manipsDiv.getElementsByTagName('li'))
       $li.append('-yaarrgggh')

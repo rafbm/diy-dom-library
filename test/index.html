@@ -89,6 +89,17 @@
       equal(stuff[3], 42)
     })
 
+    test("<tt>.each()</tt>", function() {
+      var IDs = []
+      $(document.getElementsByTagName('div')).each(function() {
+        IDs.push(this.id)
+      })
+      equal(IDs.length, 3)
+      equal(IDs[0], 'qunit-testrunner-toolbar')
+      equal(IDs[1], 'qunit-fixture')
+      equal(IDs[2], 'blah')
+    })
+
 
     module('HTML')
 
